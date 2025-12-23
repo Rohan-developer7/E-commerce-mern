@@ -1,25 +1,36 @@
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import ProductDetails from "./pages/ProductDetails";
-
 import Home from "./pages/Home";
-import Cart from "./pages/Cart";
 import Login from "./pages/Login";
+import Cart from "./pages/Cart";
+import Orders from "./pages/Orders";
+
+import ProductDetails from "./pages/ProductDetails";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 
 const App = () => {
   return (
-    <div className="px-4">
+    <BrowserRouter>
       <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
+      <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          
+          <Route path="/orders"
+           element={
+             <ProtectedRoute>
+               <Orders />
+                </ProtectedRoute>
+               } />
 
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
-
-      </Routes>
-    </div>
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 };
 

@@ -1,18 +1,33 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import products from "../data/products";
+import { fetchProductById } from "../api/productApi";
 import { useCart } from "../context/CartContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
 
-  const product = products.find(
-    (item) => item.id === Number(id)
-  );
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  if (!product) {
-    return <h2 className="mt-6">Product not found</h2>;
-  }
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const data = await fetchProductById(id);
+        setProduct(data);
+      } catch (err) {
+        setError("Product not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id]);
+
+  if (loading) return <p className="mt-6">Loading product...</p>;
+  if (error) return <p className="mt-6 text-red-500">{error}</p>;
 
   return (
     <div className="mt-6 grid md:grid-cols-2 gap-8">
@@ -32,8 +47,7 @@ const ProductDetails = () => {
         </p>
 
         <p className="text-gray-600 mb-6">
-          This is a demo product description. Later this
-          will come from backend.
+          {product.description}
         </p>
 
         <button

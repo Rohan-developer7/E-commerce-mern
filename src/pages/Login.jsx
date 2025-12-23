@@ -1,20 +1,26 @@
 import { useState } from "react";
+import { loginUser } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please fill all fields");
-      return;
+    try {
+      const data = await loginUser(email, password);
+      login(data); // store user + token
+      navigate("/");
+    } catch (err) {
+      setError("Invalid email or password");
     }
-
-    // Temporary mock login
-    console.log("Login data:", { email, password });
-    alert("Login successful (mock)");
   };
 
   return (
@@ -24,6 +30,12 @@ const Login = () => {
           Login
         </h1>
 
+        {error && (
+          <p className="text-red-500 text-sm mb-3">
+            {error}
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm mb-1">Email</label>
@@ -32,7 +44,7 @@ const Login = () => {
               className="w-full border px-3 py-2 outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
+              required
             />
           </div>
 
@@ -43,7 +55,7 @@ const Login = () => {
               className="w-full border px-3 py-2 outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              required
             />
           </div>
 
